@@ -56,6 +56,9 @@ export default {
         
         if (response.status === 200) {
           // Store token and user data
+          localStorage.setItem('token', response.data.token)
+          localStorage.setItem('user', JSON.stringify(response.data.user))
+
           auth.setToken(response.data.token)
           auth.setUser(response.data.user)
           this.$router.push('/dashboard')

@@ -22,18 +22,9 @@
               <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <div class="input-group">
-                  <input
-                    :type="showPassword ? 'text' : 'password'"
-                    class="form-control"
-                    id="password"
-                    v-model="password"
-                    required
-                  />
-                  <button 
-                    class="btn btn-outline-secondary" 
-                    type="button"
-                    @click="showPassword = !showPassword"
-                  >
+                  <input :type="showPassword ? 'text' : 'password'" class="form-control" id="password"
+                    v-model="password" required />
+                  <button class="btn btn-outline-secondary" type="button" @click="showPassword = !showPassword">
                     <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                   </button>
                 </div>
@@ -42,18 +33,10 @@
               <div class="mb-3">
                 <label for="confirmPassword" class="form-label">Confirm Password</label>
                 <div class="input-group">
-                  <input
-                    :type="showConfirmPassword ? 'text' : 'password'"
-                    class="form-control"
-                    id="confirmPassword"
-                    v-model="confirmPassword"
-                    required
-                  />
-                  <button 
-                    class="btn btn-outline-secondary" 
-                    type="button"
-                    @click="showConfirmPassword = !showConfirmPassword"
-                  >
+                  <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control" id="confirmPassword"
+                    v-model="confirmPassword" required />
+                  <button class="btn btn-outline-secondary" type="button"
+                    @click="showConfirmPassword = !showConfirmPassword">
                     <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                   </button>
                 </div>
@@ -76,7 +59,7 @@
 
 <script>
 import api from '@/api'
-
+import { useAuthStore } from '@/stores/auth'
 export default {
   name: 'RegisterView',
 
@@ -98,19 +81,27 @@ export default {
 
   methods: {
     async handleRegister() {
-      // Implement registration logic here
-      const response = await api.post('/register', {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-      })
-      console.log('Register response:', response);
-      if (response.status === 200) {
-        console.log('Register successful');
-        localStorage.setItem('token', response.data.token);
-        this.$router.push('/dashboard');
-      } else {
-        console.log('Register failed');
+      try {
+        // Implement registration logic here
+        const auth = useAuthStore()
+        const response = await api.post('/register', {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+        })
+        console.log('Register response:', response);
+        if (response.status === 200) {
+          console.log('Register successful');
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+          auth.setToken(response.data.token)
+          auth.setUser(response.data.user)
+          this.$router.push('/dashboard');
+        } else {
+          console.log('Register failed');
+        }
+      } catch (error) {
+        console.error('Register failed:', error);
       }
     },
   },
