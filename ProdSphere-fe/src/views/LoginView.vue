@@ -35,6 +35,7 @@
 
 <script>
 import api from '@/api'
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   name: 'LoginView',
@@ -45,13 +46,24 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
-      // Implement login logic here
-      console.log('Login attempt:', this.email, this.password)
-      api.post('/login', {  
-        email: this.email,
-        password: this.password,
-      })
+    async handleLogin() {
+      try {
+        const auth = useAuthStore()
+        const response = await api.post('/login', {
+          email: this.email,
+          password: this.password,
+        })
+        
+        if (response.status === 200) {
+          // Store token and user data
+          auth.setToken(response.data.token)
+          auth.setUser(response.data.user)
+          this.$router.push('/dashboard')
+        }
+      } catch (error) {
+        console.error('Login failed:', error)
+        // Handle error (show error message to user)
+      }
     },
   },
 }
