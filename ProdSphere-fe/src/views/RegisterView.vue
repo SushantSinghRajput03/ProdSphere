@@ -97,13 +97,21 @@ export default {
   },
 
   methods: {
-    handleRegister() {
+    async handleRegister() {
       // Implement registration logic here
-      api.post('/register', {
+      const response = await api.post('/register', {
         name: this.name,
         email: this.email,
         password: this.password,
       })
+      console.log('Register response:', response);
+      if (response.status === 200) {
+        console.log('Register successful');
+        localStorage.setItem('token', response.data.token);
+        this.$router.push('/dashboard');
+      } else {
+        console.log('Register failed');
+      }
     },
   },
 }
