@@ -24,7 +24,8 @@ class ProductController extends Controller
                 'sort_order' => 'nullable|string|in:asc,desc'
             ]);
 
-            $query = Product::query();
+            $query = Product::query()
+                ->select(['id', 'name', 'price', 'category', 'created_at', 'image', 'stock']);
 
             // Apply filters
             if ($request->has('category')) {
@@ -45,9 +46,15 @@ class ProductController extends Controller
             $sortOrder = $request->get('sort_order', 'desc');
             $query->orderBy($sortField, $sortOrder);
 
-            // Paginate
-            $products = $query->paginate(10);
-            return response()->json(["status" => "success", "message" => "Products fetched successfully", "data" => $products], 200);
+            // Optimize pagination by limiting the number of items
+            $perPage = min($request->get('per_page', 10), 50); // Limit maximum items per page
+            $products = $query->paginate($perPage);
+            
+            return response()->json([
+                "status" => "success", 
+                "message" => "Products fetched successfully", 
+                "data" => $products
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json(["status" => "error", "message" => "An error occurred", "error" => $th->getMessage()], 500);
         }
@@ -55,7 +62,6 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        ini_set('memory_limit', '756M');
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -84,7 +90,6 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        ini_set('memory_limit', '756M');
         try {
             $this->authorize('update', $product);
 
@@ -117,7 +122,6 @@ class ProductController extends Controller
     }
     public function destroy(Product $product)
     {
-        ini_set('memory_limit', '1024M'); // Increased memory limit further
         try {
             $this->authorize('delete', $product);
 

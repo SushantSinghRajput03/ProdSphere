@@ -26,7 +26,7 @@
                 @input="debounceSearch">
             </div>
             <div class="col-md-3">
-              <button class="btn btn-primary w-100" @click="showAddModal = true">
+              <button class="btn btn-primary w-100" @click="openAddModal">
                 <i class="bi bi-plus-circle"></i> Add Product
               </button>
             </div>
@@ -53,7 +53,7 @@
               </div>
               <div class="card-footer bg-transparent border-top-0">
                 <div class="btn-group w-100">
-                  <button class="btn btn-outline-primary" @click="editProduct(product)">
+                  <button class="btn btn-outline-primary" @click="openEditModal(product)">
                     <i class="bi bi-pencil"></i> Edit
                   </button>
                   <button class="btn btn-outline-danger" @click="deleteProduct(product)">
@@ -124,6 +124,9 @@
                   >
                   <div v-if="imagePreview" class="mt-2">
                     <img :src="imagePreview" class="img-thumbnail" style="max-height: 200px">
+                  </div>
+                  <div v-if="editingProduct && editingProduct.image" class="mt-2">
+                    <img :src="imageUrl(editingProduct.image)" class="img-thumbnail" style="max-height: 200px">
                   </div>
                 </div>
                 <div class="text-end">
@@ -197,6 +200,34 @@ export default {
       }
     }
 
+    const openAddModal = () => {
+      showAddModal.value = true
+      editingProduct.value = null
+      productForm.value = {
+        name: '',
+        description: '',
+        price: '',
+        category: '',
+        stock: '',
+        image: null
+      }
+      imagePreview.value = null
+    }
+
+    const openEditModal = (product) => {
+      editingProduct.value = product
+      productForm.value = {
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        category: product.category,
+        stock: product.stock,
+        image: null
+      }
+      imagePreview.value = null
+      showAddModal.value = true
+    }
+
     const handleSubmit = async () => {
       try {
         const formData = new FormData()
@@ -208,21 +239,15 @@ export default {
         formData.append('category', productForm.value.category)
         formData.append('stock', productForm.value.stock)
         
-        // Handle image file - directly access the file from the input element
+        // Handle image file - only append if new image is selected
         const fileInput = document.querySelector('input[type="file"]')
         if (fileInput && fileInput.files[0]) {
           formData.append('image', fileInput.files[0])
-          console.log('Appending image:', fileInput.files[0])
-        }
-
-        // Debug log
-        for (let [key, value] of formData.entries()) {
-          console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value)
         }
 
         let response
         if (editingProduct.value) {
-          formData.append('_method', 'PUT')
+          formData.append('_method', 'PUT') 
           response = await api.post(`/products/${editingProduct.value.id}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -236,7 +261,6 @@ export default {
           })
         }
 
-        console.log('Response:', response)
         if (response.data.status === 'success' || response.status === 200) {
           closeModal()
           await loadProducts()
@@ -257,6 +281,7 @@ export default {
         stock: '',
         image: null
       }
+      imagePreview.value = null
     }
 
     const handleImageChange = (event) => {
@@ -280,13 +305,6 @@ export default {
         // Store the raw File object
         productForm.value.image = file
         imagePreview.value = URL.createObjectURL(file)
-        
-        console.log('Selected image:', {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          file: file // Log the actual file object
-        })
       }
     }
 
@@ -311,12 +329,15 @@ export default {
       showAddModal,
       editingProduct,
       productForm,
+      imagePreview,
       loadProducts,
       handleSubmit,
       closeModal,
       handleImageChange,
       deleteProduct,
-      imageUrl
+      imageUrl,
+      openAddModal,
+      openEditModal
     }
   }
 }
