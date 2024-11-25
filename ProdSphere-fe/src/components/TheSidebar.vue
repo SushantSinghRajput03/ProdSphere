@@ -32,10 +32,6 @@ export default {
       menuItems: [
         { name: 'Dashboard', path: '/dashboard', icon: 'bi bi-grid-1x2' },
         { name: 'Products', path: '/products', icon: 'bi bi-box' },
-        { name: 'Orders', path: '/orders', icon: 'bi bi-cart' },
-        { name: 'Customers', path: '/customers', icon: 'bi bi-people' },
-        { name: 'Reports', path: '/reports', icon: 'bi bi-graph-up' },
-        { name: 'Settings', path: '/settings', icon: 'bi bi-gear' }
       ]
     }
   }

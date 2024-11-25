@@ -20,13 +20,6 @@
           <i class="bi bi-chevron-down"></i>
           
           <div class="user-menu" v-show="showUserMenu">
-            <router-link to="/profile" class="menu-item">
-              <i class="bi bi-person"></i> Profile
-            </router-link>
-            <router-link to="/settings" class="menu-item">
-              <i class="bi bi-gear"></i> Settings
-            </router-link>
-            <div class="divider"></div>
             <a href="#" class="menu-item text-danger" @click.prevent="handleLogout">
               <i class="bi bi-box-arrow-right"></i> Logout
             </a>

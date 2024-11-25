@@ -67,19 +67,39 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
 import DashboardLayout from '@/layouts/DashboardLayout.vue'
+import api from '@/api'
+import { useAuthStore } from '@/stores/auth'
 
 export default {
   name: 'DashboardView',
   components: {
     DashboardLayout
   },
-  data() {
+  setup() {
+    const totalProducts = ref(0)
+    
+    const fetchTotalProducts = async () => {
+      try {
+        const auth = useAuthStore()
+        api.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`
+        const response = await api.get('/products')
+        totalProducts.value = response.data.data.total
+      } catch (error) {
+        console.error('Error fetching total products:', error)
+      }
+    }
+
+    onMounted(() => {
+      fetchTotalProducts()
+    })
+
     return {
       stats: [
         { title: 'Total Sales', value: '$24,580', icon: 'bi bi-currency-dollar', color: 'bg-primary' },
         { title: 'Total Orders', value: '145', icon: 'bi bi-cart', color: 'bg-success' },
-        { title: 'Total Products', value: '89', icon: 'bi bi-box', color: 'bg-warning' },
+        { title: 'Total Products', value: totalProducts, icon: 'bi bi-box', color: 'bg-warning' },
         { title: 'Total Customers', value: '524', icon: 'bi bi-people', color: 'bg-info' }
       ],
       recentActivities: [
