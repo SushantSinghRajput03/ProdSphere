@@ -25,7 +25,7 @@ class ProductController extends Controller
             ]);
 
             $query = Product::query()
-                ->select(['id', 'name', 'price', 'category', 'created_at', 'image', 'stock']);
+                ->select(['id', 'name', 'price','description', 'category', 'created_at', 'image', 'stock']);
 
             // Apply filters
             if ($request->has('category')) {

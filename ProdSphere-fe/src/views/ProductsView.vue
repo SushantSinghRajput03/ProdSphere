@@ -209,7 +209,6 @@ export default {
           const uniqueCategories = new Set(response.data.data.data.map(product => product.category))
           categories.value = Array.from(uniqueCategories).filter(Boolean).sort()
         }
-        console.log('categories.value : ', categories.value)
       } catch (error) {
         console.error('Error loading products:', error)
       }
@@ -262,8 +261,7 @@ export default {
 
         let response
         if (editingProduct.value) {
-          formData.append('_method', 'PUT') 
-          response = await api.post(`/products/${editingProduct.value.id}`, formData, {
+          response = await api.put(`/products/${editingProduct.value.id}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             }
