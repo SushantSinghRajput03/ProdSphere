@@ -148,6 +148,13 @@ import DashboardLayout from '@/layouts/DashboardLayout.vue'
 import api from '@/api'
 import { useAuthStore } from '@/stores/auth'
 
+const debounce = (fn, delay) => {
+  let timeoutId
+  return (...args) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
 
 export default {
   name: 'ProductsView',
@@ -190,7 +197,9 @@ export default {
         api.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`
         const response = await api.get('/products', {
           params: {
-            ...filters.value, 
+            ...Object.fromEntries(
+              Object.entries(filters.value).filter(([, value]) => value !== null && value !== '')
+            ),
             page: currentPage.value
           }
         })
@@ -324,6 +333,10 @@ export default {
       loadProducts()
     }
 
+    const debounceSearch = debounce(() => {
+      loadProducts()
+    }, 300)
+
     onMounted(loadProducts)
 
     return {
@@ -343,7 +356,8 @@ export default {
       imageUrl,
       openAddModal,
       openEditModal,
-      changePage
+      changePage,
+      debounceSearch
     }
   }
 }
