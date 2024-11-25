@@ -319,6 +319,11 @@ export default {
       }
     }
 
+    const changePage = (page) => {
+      currentPage.value = page
+      loadProducts()
+    }
+
     onMounted(loadProducts)
 
     return {
@@ -337,7 +342,8 @@ export default {
       deleteProduct,
       imageUrl,
       openAddModal,
-      openEditModal
+      openEditModal,
+      changePage
     }
   }
 }
