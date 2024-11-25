@@ -76,6 +76,11 @@ Follow these steps to set up the project locally:
    # Install dependencies
    npm install
    ```
+   # Set up environment file
+   cp .env.example .env
+   
+   # Update the VITE_API_URL in .env file to match your backend URL
+   # Example: VITE_API_URL=http://localhost:8000
 
 4. **Start Development Servers**
    ```bash
