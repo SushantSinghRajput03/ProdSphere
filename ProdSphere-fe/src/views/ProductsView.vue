@@ -10,8 +10,8 @@
                 @input="debounceSearch">
             </div>
             <div class="col-md-2">
-              <select v-model="filters.category" class="form-select" @change="loadProducts">
-                <option value="">All Categories</option>
+              <select v-model="filters.category" class="form-select" @change="debounceSearch">
+                <option :value="null">All Categories</option>
                 <option v-for="category in categories" :key="category" :value="category">
                   {{ category }}
                 </option>
@@ -186,6 +186,7 @@ export default {
       stock: '',
       image: null
     })
+    const categories = ref([])
 
     const imageUrl = (image) => {
       return `${import.meta.env.VITE_API_URL}/storage/products/${image}`
@@ -204,6 +205,11 @@ export default {
           }
         })
         products.value = response.data.data
+        if(categories.value.length === 0) {
+          const uniqueCategories = new Set(response.data.data.data.map(product => product.category))
+          categories.value = Array.from(uniqueCategories).filter(Boolean).sort()
+        }
+        console.log('categories.value : ', categories.value)
       } catch (error) {
         console.error('Error loading products:', error)
       }
@@ -357,7 +363,8 @@ export default {
       openAddModal,
       openEditModal,
       changePage,
-      debounceSearch
+      debounceSearch,
+      categories
     }
   }
 }
