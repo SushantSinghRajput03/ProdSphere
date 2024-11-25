@@ -74,8 +74,8 @@ class ProductController extends Controller
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $name = uniqid() . '.' . $image->getClientOriginalExtension();
-                $path = Storage::putFileAs('public/products', $image, $name);
+                $name = (time() * time()) . '.' . $image->getClientOriginalExtension();
+                $path = Storage::disk('public')->putFileAs('products', $image, $name);
                 $validated['image'] = $name;
             }
 
@@ -104,12 +104,12 @@ class ProductController extends Controller
 
             if ($request->hasFile('image')) {
                 if ($product->image) {
-                    Storage::delete('public/products/' . $product->image);
+                    Storage::disk('public')->delete("products/{$product->image}");
                 }
                 
                 $image = $request->file('image');
-                $name = uniqid() . '.' . $image->getClientOriginalExtension();
-                Storage::putFileAs('public/products', $image, $name);
+                $name = (time() * time()) . '.' . $image->getClientOriginalExtension();
+                Storage::disk('public')->putFileAs('products', $image, $name);
                 $validated['image'] = $name;
             }
 
@@ -126,7 +126,7 @@ class ProductController extends Controller
             $this->authorize('delete', $product);
 
             if ($product->image) {
-                Storage::delete('public/products/' . $product->image); // Fixed storage path to match other methods
+                Storage::disk('public')->delete("products/{$product->image}");
             }
             $product->delete();
             return response()->json(["status" => "success", "message" => "Product deleted successfully"], 200);
